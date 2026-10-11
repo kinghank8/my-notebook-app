@@ -14,14 +14,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # 2. Распаковка вашего ZIP-архива прямо на сервере
+    # 2. Распаковка вашего ZIP-архива и автоматическое исправление версий Java
     - name: Unzip project files
       run: |
         unzip MyNotebook-Android-Project.zip
-        # Переносим содержимое распакованной папки в корень для сборщика
         cp -r MyNotebook/* . || true
+        # Принудительно выставляем совместимость с Java 17 в файлах build.gradle
+        find . -name "build.gradle*" -exec sed -i 's/JavaVersion.VERSION_1_8/JavaVersion.VERSION_17/g' {} +
+        find . -name "build.gradle*" -exec sed -i 's/"1.8"/"17"/g' {} +
 
-    # 3. Установка Java
+    # 3. Установка Java 17
     - name: set up JDK 17
       uses: actions/setup-java@v4
       with:
